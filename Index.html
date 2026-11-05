@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zion Fire Devotional</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#ff6b6b; --bg2:#feca57; --card:#fff; --text:#333; --accent:#e74c3c; --green:#2ecc71;
+  }
+  body.dark{
+    --bg1:#1a1a2e; --bg2:#16213e; --card:#0f3460; --text:#eee; --accent:#ff6b6b; --green:#16c784;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+  body{display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,var(--bg1),var(--bg2));padding:20px;transition:0.3s}
+.card{background:var(--card);padding:40px;border-radius:20px;max-width:600px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;transition:0.3s}
+  h2{color:var(--accent);margin-bottom:10px}
+.category-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:25px}
+.cat-btn{padding:8px 16px;border:2px solid var(--accent);background:transparent;color:var(--accent);border-radius:20px;cursor:pointer;font-weight:600;transition:0.3s}
+.cat-btn.active,.cat-btn:hover{background:var(--accent);color:var(--card)}
+.quote{font-size:1.4rem;font-weight:600;color:var(--text);margin:20px 0;min-height:80px}
+.verse{font-size:1rem;color:var(--accent);font-style:italic;margin-bottom:20px}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-weight:600;transition:0.3s}
+.btn-primary{background:var(--accent);color:var(--card)}
+.btn-secondary{background:var(--green);color:var(--card)}
+.btn-fav{background:#f39c12;color:#fff}
+.btn:hover{transform:translateY(-2px)}
+ #searchBox{width:100%; padding:12px; border-radius:10px; border:2px solid var(--accent); margin:15px 0; font-size:1rem; display:none; background:var(--card); color:var(--text);}
+.top-bar{display:flex;justify-content:space-between;margin-bottom:15px}
+.icon-btn{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--accent)}
+.daily-badge{background:var(--green);color:#fff;padding:5px 12px;border-radius:20px;font-size:0.8rem;margin-bottom:10px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top-bar">
+    <button class="icon-btn" onclick="toggleDark()" title="Dark Mode">🌙</button>
+    <button class="icon-btn" onclick="showFavorites()" title="Favorites">⭐</button>
+  </div>
+
+  <span class="daily-badge" id="dailyBadge" style="display:none;">VERSE OF THE DAY</span>
+  <h2>🔥 Zion Fire Daily Devotional</h2>
+
+  <div class="category-btns" id="categoryBtns">
+    <button class="cat-btn active" onclick="setCategory('all')">All</button>
+    <button class="cat-btn" onclick="setCategory('faith')">Faith</button>
+    <button class="cat-btn" onclick="setCategory('hope')">Hope</button>
+    <button class="cat-btn" onclick="setCategory('prayer')">Prayer</button>
+    <button class="cat-btn" onclick="setCategory('Strength & Purpose')">Strength & Purpose</button>
+    <button class="cat-btn" onclick="setCategory('Wisdom & Guidance')">Wisdom & Guidance</button>
+    <button class="cat-btn" onclick="setCategory('Joy & Gratitude')">Joy & Gratitude</button>
+    <button class="cat-btn" onclick="setCategory('Peace & Anxiety')">Peace & Anxiety</button>
+    <button class="cat-btn" onclick="setCategory('Provision & Blessing')">Provision & Blessing</button>
+    <button class="cat-btn" onclick="setCategory('Victory & Identity')">Victory & Identity</button>
+  </div>
+
+  <div class="quote" id="quote">Click "New Devotional" to start</div>
+  <div class="verse" id="verse"></div>
+
+  <input type="text" id="searchBox" placeholder="🔍 Search for 'peace & anxiety', 'faith', 'psalm', 'hope', 'prayer', 'strength & purpose', 'wisdom & guidance', 'joy & gratitude', 'provision & blessing', 'victory & identity' ...">
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="newDevotional()">New Devotional</button>
+    <button class="btn btn-fav" onclick="toggleFavorite()">⭐ Favorite</button>
+    <button class="btn btn-secondary" onclick="copyText()">Copy</button>
+    <button class="btn btn-secondary" onclick="shareWhatsApp()">Share</button>
+    <button class="btn btn-secondary" onclick="shareImage()">📸 Share Image</button>
+    <button class="btn btn-secondary" onclick="toggleSearch()">🔍 Search</button>
+  </div>
+</div>
+
+<!-- Hidden canvas for generating share image -->
+<canvas id="shareCanvas" width="1080" height="1080" style="display:none;"></canvas>
+
+<script>
+const devotionals = [
+  // ===== FAITH =====
+  {cat:'faith', q:"Faith is taking the first step even when you don't see the whole staircase.", v:"Hebrews 11:1"},
+  {cat:'faith', q:"God didn't bring you this far to leave you. Trust the process.", v:"Deuteronomy 31:8"},
+  {cat:'faith', q:"God is with you", v:"Isaiah 41:10"},
+  {cat:'faith', q:"Do not be afraid, for I am with you", v:"Joshua 1:9"},
+  {cat:'faith', q:"All things are possible to him who believes", v:"Mark 9:23"},
+  {cat:'faith', q:"I can do all things through Christ", v:"Philippians 4:13"},
+  {cat:'faith', q:"Faith comes by hearing the word of God", v:"Romans 10:17"},
+  {cat:'faith', q:"Without faith it is impossible to please God", v:"Hebrews 11:6"},
+  {cat:'faith', q:"We walk by faith, not by sight", v:"2 Corinthians 5:7"},
+  {cat:'faith', q:"Faith moves mountains because God moves through faith.", v:"Matthew 17:20"},
+  {cat:'faith', q:"When God is for you, no one can stand against you.", v:"Romans 8:31"},
+  {cat:'faith', q:"Trust in the Lord with all your heart and lean not on your own understanding.", v:"Proverbs 3:5"},
+  {cat:'faith', q:"God's plans for you are plans to prosper you and not to harm you.", v:"Jeremiah 29:11"},
+  {cat:'faith', q:"The just shall live by faith.", v:"Habakkuk 2:4"},
+  {cat:'faith', q:"Be strong and courageous. Do not be afraid, for the Lord your God goes with you.", v:"Deuteronomy 31:6"},
+
+  // ===== HOPE =====
+  {cat:'hope', q:"Hope anchors the soul. Even in the storm, God is working.", v:"Romans 15:13"},
+  {cat:'hope', q:"Your current situation is not your final destination.", v:"Jeremiah 29:11"},
+  {cat:'hope', q:"May the God of hope fill you with all joy and peace in believing.", v:"Romans 15:13"},
+  {cat:'hope', q:"Weeping may endure for a night, but joy comes in the morning.", v:"Psalm 30:5"},
+  {cat:'hope', q:"Those who hope in the Lord will renew their strength.", v:"Isaiah 40:31"},
+  {cat:'hope', q:"God turns ashes into beauty and mourning into dancing.", v:"Isaiah 61:3"},
+  {cat:'hope', q:"The Lord is near to the brokenhearted and saves the crushed in spirit.", v:"Psalm 34:18"},
+  {cat:'hope', q:"Hold on. Your breakthrough is closer than you think.", v:"Galatians 6:9"},
+
+  // ===== PRAYER =====
+  {cat:'prayer', q:"Prayer is not asking. It is a longing of the soul.", v:"Philippians 4:6"},
+  {cat:'prayer', q:"Talk to God like He’s your Father, because He is.", v:"Matthew 6:9"},
+  {cat:'prayer', q:"Pray without ceasing.", v:"1 Thessalonians 5:17"},
+  {cat:'prayer', q:"The prayer of a righteous person has great power.", v:"James 5:16"},
+  {cat:'prayer', q:"Come to me, all who are weary, and I will give you rest.", v:"Matthew 11:28"},
+  {cat:'prayer', q:"If you ask anything in my name, I will do it.", v:"John 14:14"},
+  {cat:'prayer', q:"Call to me and I will answer you.", v:"Jeremiah 33:3"},
+
+  // ===== STRENGTH & PURPOSE =====
+  {cat:'Strength & Purpose', q:"When you feel weak, His strength is made perfect in your weakness.", v:"2 Corinthians 12:9"},
+  {cat:'Strength & Purpose', q:"The Lord is my shepherd, I shall not want", v:"Psalm 23:1"},
+  {cat:'Strength & Purpose', q:"You are stronger than you think, because God is with you.", v:"Isaiah 41:10"},
+  {cat:'Strength & Purpose', q:"I can do all things through Christ who strengthens me.", v:"Philippians 4:13"},
+  {cat:'Strength & Purpose', q:"Be strong and take heart, all you who hope in the Lord.", v:"Psalm 31:24"},
+  {cat:'Strength & Purpose', q:"The Lord is my strength and my shield.", v:"Psalm 28:7"},
+  {cat:'Strength & Purpose', q:"God has not given us a spirit of fear, but of power and love.", v:"2 Timothy 1:7"},
+
+  // ===== PEACE & ANXIETY =====
+  {cat:'Peace & Anxiety', q:"Cast all your anxiety on Him", v:"1 Peter 5:7"},
+  {cat:'Peace & Anxiety', q:"Do not be anxious about anything, but in everything by prayer.", v:"Philippians 4:6"},
+  {cat:'Peace & Anxiety', q:"Peace I leave with you; my peace I give to you.", v:"John 14:27"},
+  {cat:'Peace & Anxiety', q:"You keep him in perfect peace whose mind is stayed on you.", v:"Isaiah 26:3"},
+  {cat:'Peace & Anxiety', q:"The Lord will fight for you, and you have only to be silent.", v:"Exodus 14:14"},
+  {cat:'Peace & Anxiety', q:"God is our refuge and strength, a very present help in trouble.", v:"Psalm 46:1"},
+
+  // ===== JOY & GRATITUDE =====
+  {cat:'Joy & Gratitude', q:"The joy of the Lord is your strength.", v:"Nehemiah 8:10"},
+  {cat:'Joy & Gratitude', q:"Rejoice in the Lord always; again I will say, rejoice.", v:"Philippians 4:4"},
+  {cat:'Joy & Gratitude', q:"Give thanks in all circumstances.", v:"1 Thessalonians 5:18"},
+  {cat:'Joy & Gratitude', q:"Count it all joy when you meet trials.", v:"James 1:2"},
+  {cat:'Joy & Gratitude', q:"Enter His gates with thanksgiving.", v:"Psalm 100:4"},
+  {cat:'Joy & Gratitude', q:"A joyful heart is good medicine.", v:"Proverbs 17:22"},
+  {cat:'Joy & Gratitude', q:"This is the day that the Lord has made.", v:"Psalm 118:24"},
+
+  // ===== PROVISION & BLESSING =====
+  {cat:'Provision & Blessing', q:"God's grace is sufficient for you", v:"2 Corinthians 12:9"},
+  {cat:'Provision & Blessing', q:"And my God will supply every need of yours.", v:"Philippians 4:19"},
+  {cat:'Provision & Blessing', q:"The Lord is my shepherd; I shall not want.", v:"Psalm 23:1"},
+  {cat:'Provision & Blessing', q:"Seek first the kingdom of God.", v:"Matthew 6:33"},
+  {cat:'Provision & Blessing', q:"The blessing of the Lord makes rich.", v:"Proverbs 10:22"},
+  {cat:'Provision & Blessing', q:"Give, and it will be given to you.", v:"Luke 6:38"},
+
+  // ===== VICTORY & IDENTITY =====
+  {cat:'Victory & Identity', q:"Greater is He that is in you", v:"1 John 4:4"},
+  {cat:'Victory & Identity', q:"God works all things for the good", v:"Romans 8:28"},
+  {cat:'Victory & Identity', q:"You are a chosen race, a royal priesthood.", v:"1 Peter 2:9"},
+  {cat:'Victory & Identity', q:"No weapon formed against you shall prosper.", v:"Isaiah 54:17"},
+  {cat:'Victory & Identity', q:"We are more than conquerors through Him.", v:"Romans 8:37"},
+  {cat:'Victory & Identity', q:"You are God's masterpiece.", v:"Ephesians 2:10"},
+  {cat:'Victory & Identity', q:"Thanks be to God, who gives us the victory.", v:"1 Corinthians 15:57"},
+
+  // ===== WISDOM & GUIDANCE =====
+  {cat:'Wisdom & Guidance', q:"If any of you lacks wisdom, let him ask God.", v:"James 1:5"},
+  {cat:'Wisdom & Guidance', q:"Trust in the Lord and He will make straight your paths.", v:"Proverbs 3:6"},
+  {cat:'Wisdom & Guidance', q:"Your word is a lamp to my feet.", v:"Psalm 119:105"},
+  {cat:'Wisdom & Guidance', q:"The fear of the Lord is the beginning of wisdom.", v:"Proverbs 9:10"},
+  {cat:'Wisdom & Guidance', q:"I will instruct you and teach you.", v:"Psalm 32:8"}
+];
+
+let currentCategory = 'all';
+let currentDevotional = {};
+let favorites = JSON.parse(localStorage.getItem('zionFavorites')) || [];
+
+// DARK MODE
+function toggleDark(){
+  document.body.classList.toggle('dark');
+  localStorage.setItem('zionDark', document.body.classList.contains('dark'));
+}
+if(localStorage.getItem('zionDark') === 'true') document.body.classList.add('dark');
+
+// DAILY VERSE
+function loadDailyVerse(){
+  const today = new Date().toDateString();
+  const savedDate = localStorage.getItem('zionDailyDate');
+  if(savedDate!== today){
+    const random = devotionals[Math.floor(Math.random() * devotionals.length)];
+    localStorage.setItem('zionDaily', JSON.stringify(random));
+    localStorage.setItem('zionDailyDate', today);
+  }
+  currentDevotional = JSON.parse(localStorage.getItem('zionDaily'));
+  document.getElementById('dailyBadge').style.display = 'inline-block';
+  document.getElementById('categoryBtns').style.display = 'none';
+  showCurrent();
+}
+function showCurrent(){
+  document.getElementById('quote').innerText = `"${currentDevotional.q}"`;
+  document.getElementById('verse').innerText = `- ${currentDevotional.v}`;
+  updateFavButton();
+}
+
+// FAVORITES
+function toggleFavorite(){
+  const exists = favorites.find(f => f.q === currentDevotional.q);
+  if(exists){
+    favorites = favorites.filter(f => f.q!== currentDevotional.q);
+    alert('Removed from Favorites');
+  } else {
+    favorites.push(currentDevotional);
+    alert('Added to Favorites ⭐');
+  }
+  localStorage.setItem('zionFavorites', JSON.stringify(favorites));
+  updateFavButton();
+}
+function updateFavButton(){
+  const exists = favorites.find(f => f.q === currentDevotional.q);
+  document.querySelector('.btn-fav').innerText = exists? '💔 Unfavorite' : '⭐ Favorite';
+}
+function showFavorites(){
+  if(favorites.length === 0){ alert('No favorites yet. Tap ⭐ to add some!'); return; }
+  currentCategory = 'favorites';
+  document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('categoryBtns').style.display = 'none';
+  document.getElementById('dailyBadge').style.display = 'none';
+  currentDevotional = favorites[Math.floor(Math.random() * favorites.length)];
+  showCurrent();
+}
+
+// CATEGORIES + NEW
+function setCategory(cat){
+  currentCategory = cat;
+  document.getElementById('categoryBtns').style.display = 'flex';
+  document.getElementById('dailyBadge').style.display = 'none';
+  document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  newDevotional();
+}
+
+function newDevotional(){
+  let filtered = currentCategory === 'all'? devotionals :
+                 currentCategory === 'favorites'? favorites :
+                 devotionals.filter(d => d.cat.toLowerCase() === currentCategory.toLowerCase());
+  if(filtered.length === 0) filtered = devotionals;
+  currentDevotional = filtered[Math.floor(Math.random() * filtered.length)];
+  showCurrent();
+}
+
+// COPY + SHARE
+function copyText(){
+  const text = `${currentDevotional.q} - ${currentDevotional.v}`;
+  navigator.clipboard.writeText(text);
+  alert('Copied to clipboard!');
+}
+function shareWhatsApp(){
+  const text = encodeURIComponent(`${currentDevotional.q}\n\n${currentDevotional.v}\n\n- Shared from Zion Fire Devotional`);
+  window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+// SHARE IMAGE
+function shareImage(){
+  const canvas = document.getElementById('shareCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Background gradient
+  const gradient = ctx.createLinearGradient(0,0,1080,1080);
+  gradient.addColorStop(0, '#ff6b6b');
+  gradient.addColorStop(1, '#feca57');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0,0,1080,1080);
+
+  // Card
+  ctx.fillStyle = 'white';
+  ctx.roundRect(60, 200, 960, 680, 40);
+  ctx.fill();
+
+  // Text
+  ctx.fillStyle = '#e74c3c';
+  ctx.font = 'bold 60px Poppins';
+  ctx.textAlign = 'center';
+  ctx.fillText('🔥 Zion Fire', 540, 280);
+
+  ctx.fillStyle = '#333';
+  ctx.font = '48px Poppins';
+  wrapText(ctx, `"${currentDevotional.q}"`, 540, 380, 900, 60);
+
+  ctx.fillStyle = '#e74c3c';
+  ctx.font = 'italic 36px Poppins';
+  ctx.fillText(`- ${currentDevotional.v}`, 540, 750);
+
+  // Download
+  const link = document.createElement('a');
+  link.download = 'zion-fire-verse.png';
+  link.href = canvas.toDataURL();
+  link.click();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' ');
+  let line = '';
+  for(let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if(metrics.width > maxWidth && n > 0) {
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+
+// SEARCH
+function toggleSearch(){
+  let box = document.getElementById('searchBox');
+  box.style.display = box.style.display === 'block'? 'none' : 'block';
+  if(box.style.display === 'block') box.focus();
+}
+document.getElementById('searchBox').addEventListener('input', function(){
+  let searchWord = this.value.toLowerCase();
+  if(searchWord === '') return;
+  let results = devotionals.filter(d =>
+    d.q.toLowerCase().includes(searchWord) ||
+    d.v.toLowerCase().includes(searchWord) ||
+    d.cat.toLowerCase().includes(searchWord)
+  );
+  if(results.length > 0){
+    currentDevotional = results[Math.floor(Math.random() * results.length)];
+    showCurrent();
+  }
+});
+
+// INIT
+loadDailyVerse(); // Shows verse of the day first
+</script>
+</body>
+</html>
